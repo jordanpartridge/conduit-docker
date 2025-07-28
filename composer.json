@@ -28,24 +28,27 @@
     },
     "autoload": {
         "psr-4": {
-            "Jordanpartridge\\ConduitDocker\\": "src/"
+            "JordanPartridge\\ConduitDocker\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Jordanpartridge\\ConduitDocker\\Tests\\": "tests/"
+            "JordanPartridge\\ConduitDocker\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Jordanpartridge\\ConduitDocker\\ServiceProvider"
+                "JordanPartridge\\ConduitDocker\\ServiceProvider"
             ]
         },
         "conduit": {
             "component": true,
             "commands": [
-                "docker:init"
+                "docker:init",
+                "docker:deploy", 
+                "docker:health",
+                "docker:rollback"
             ]
         }
     },

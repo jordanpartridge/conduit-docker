@@ -1,0 +1,62 @@
+FROM php:8.3-fpm-alpine
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    curl \
+    libpng-dev \
+    oniguruma-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    postgresql-dev \
+    libzip-dev \
+    nginx \
+    supervisor
+
+# Install PHP extensions
+RUN docker-php-ext-install \
+    pdo_pgsql \
+    pgsql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd \
+    zip
+
+# Get latest Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Create application directory
+WORKDIR /var/www/html
+
+# Copy composer files
+COPY composer.json composer.lock ./
+
+# Install dependencies
+RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
+
+# Copy application code
+COPY . .
+
+# Generate autoloader
+RUN composer dump-autoload --no-dev --optimize
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
+
+# Copy configuration files
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY docker/php.ini /usr/local/etc/php/conf.d/99-laravel.ini
+
+# No need for startup script - using Artisan command
+
+# Expose port 80
+EXPOSE 80
+
+# Start application using Artisan command
+CMD ["php", "artisan", "docker:container:start"]
