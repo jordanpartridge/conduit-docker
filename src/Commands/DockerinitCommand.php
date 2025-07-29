@@ -64,6 +64,8 @@ class DockerInitCommand extends Command
                 File::copy($stubFile, $targetFile);
                 File::chmod($targetFile, 0755);
                 $this->line("✓ Created {$target}");
+            } else {
+                $this->warn("⚠️ Stub file not found: {$stubFile}");
             }
         }
     }
