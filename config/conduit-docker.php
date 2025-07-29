@@ -8,7 +8,7 @@ return [
     */
     'image_name' => env('DOCKER_IMAGE_NAME', config('app.name', 'laravel-app')),
     'registry' => env('DOCKER_REGISTRY', 'localhost:5000'),
-    
+
     /*
     |--------------------------------------------------------------------------
     | Environment Settings

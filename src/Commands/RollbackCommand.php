@@ -7,13 +7,14 @@ use Illuminate\Console\Command;
 class RollbackCommand extends Command
 {
     protected $signature = 'conduit:rollback {--environment=development : Environment to rollback} {--to=previous : Rollback target}';
+
     protected $description = 'Rollback to a previous deployment';
 
     public function handle(): int
     {
         $environment = $this->option('environment');
         $target = $this->option('to');
-        
+
         $this->info("🔄 Rolling back {$environment} deployment to {$target}...");
 
         // For now, this is a placeholder implementation

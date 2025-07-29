@@ -16,7 +16,7 @@ class ServiceProvider extends BaseServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/conduit-docker.php',
+            __DIR__.'/../config/conduit-docker.php',
             'conduit-docker'
         );
     }
@@ -33,11 +33,11 @@ class ServiceProvider extends BaseServiceProvider
             ]);
 
             $this->publishes([
-                __DIR__ . '/../config/conduit-docker.php' => config_path('conduit-docker.php'),
+                __DIR__.'/../config/conduit-docker.php' => config_path('conduit-docker.php'),
             ], 'conduit-docker-config');
 
             $this->publishes([
-                __DIR__ . '/../stubs' => base_path('docker'),
+                __DIR__.'/../stubs' => base_path('docker'),
             ], 'conduit-docker-stubs');
         }
     }

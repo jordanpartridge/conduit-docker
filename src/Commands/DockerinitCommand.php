@@ -7,27 +7,28 @@ use Illuminate\Support\Facades\File;
 
 class DockerInitCommand extends Command
 {
-    protected $signature = 'conduit:docker:init {--environment=development : Environment to initialize for}';
+    protected $signature = 'docker:init {--environment=development : Environment to initialize for}';
+
     protected $description = 'Initialize Docker configuration for Laravel application';
 
     public function handle(): int
     {
         $environment = $this->option('environment');
-        
+
         $this->info("🐳 Initializing Docker configuration for {$environment} environment...");
 
         // Create docker directory if it doesn't exist
-        if (!File::exists(base_path('docker'))) {
+        if (! File::exists(base_path('docker'))) {
             File::makeDirectory(base_path('docker'), 0755, true);
             $this->info('📁 Created docker directory');
         }
 
         // Copy stubs based on environment
         $this->copyStubs($environment);
-        
+
         // Update .env.example with Docker variables
         $this->updateEnvExample();
-        
+
         // Validate Laravel configuration
         $this->validateConfiguration();
 
@@ -43,8 +44,8 @@ class DockerInitCommand extends Command
 
     protected function copyStubs(string $environment): void
     {
-        $stubsPath = __DIR__ . '/../../stubs';
-        
+        $stubsPath = __DIR__.'/../../stubs';
+
         $files = [
             'Dockerfile.production' => 'Dockerfile.production',
             'docker-compose.yml' => 'docker-compose.yml',
@@ -58,7 +59,7 @@ class DockerInitCommand extends Command
         foreach ($files as $stub => $target) {
             $stubFile = "{$stubsPath}/{$stub}";
             $targetFile = base_path("docker/{$target}");
-            
+
             if (File::exists($stubFile)) {
                 File::copy($stubFile, $targetFile);
                 File::chmod($targetFile, 0755);
@@ -70,9 +71,10 @@ class DockerInitCommand extends Command
     protected function updateEnvExample(): void
     {
         $envExamplePath = base_path('.env.example');
-        
-        if (!File::exists($envExamplePath)) {
+
+        if (! File::exists($envExamplePath)) {
             $this->warn('⚠️ .env.example not found, skipping Docker variables update');
+
             return;
         }
 
@@ -89,9 +91,9 @@ class DockerInitCommand extends Command
         ];
 
         $content = File::get($envExamplePath);
-        
+
         // Only add if not already present
-        if (!str_contains($content, 'DOCKER_IMAGE_NAME')) {
+        if (! str_contains($content, 'DOCKER_IMAGE_NAME')) {
             File::append($envExamplePath, implode("\n", $dockerVars));
             $this->line('✓ Updated .env.example with Docker variables');
         }
@@ -104,7 +106,7 @@ class DockerInitCommand extends Command
         // Check for required directories
         $requiredDirs = ['storage/app', 'storage/logs', 'bootstrap/cache'];
         foreach ($requiredDirs as $dir) {
-            if (!File::exists(base_path($dir))) {
+            if (! File::exists(base_path($dir))) {
                 $issues[] = "Missing directory: {$dir}";
             }
         }
@@ -112,12 +114,12 @@ class DockerInitCommand extends Command
         // Check for common Laravel files
         $requiredFiles = ['artisan', 'composer.json', 'config/app.php'];
         foreach ($requiredFiles as $file) {
-            if (!File::exists(base_path($file))) {
+            if (! File::exists(base_path($file))) {
                 $issues[] = "Missing file: {$file}";
             }
         }
 
-        if (!empty($issues)) {
+        if (! empty($issues)) {
             $this->warn('⚠️ Configuration issues detected:');
             foreach ($issues as $issue) {
                 $this->line("  - {$issue}");
