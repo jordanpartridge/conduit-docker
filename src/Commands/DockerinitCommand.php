@@ -60,10 +60,22 @@ class DockerInitCommand extends Command
             $stubFile = "{$stubsPath}/{$stub}";
             $targetFile = base_path("docker/{$target}");
 
+            $this->line("📂 Debug: Stub path: {$stubFile}");
+            $this->line("📂 Debug: Target path: {$targetFile}");
+            $this->line("📂 Debug: Base path: " . base_path());
+
             if (File::exists($stubFile)) {
-                File::copy($stubFile, $targetFile);
-                File::chmod($targetFile, 0755);
-                $this->line("✓ Created {$target}");
+                try {
+                    File::copy($stubFile, $targetFile);
+                    if (File::exists($targetFile)) {
+                        File::chmod($targetFile, 0755);
+                        $this->line("✓ Created {$target}");
+                    } else {
+                        $this->error("❌ File copy failed: {$target}");
+                    }
+                } catch (\Exception $e) {
+                    $this->error("❌ Copy exception: {$e->getMessage()}");
+                }
             } else {
                 $this->warn("⚠️ Stub file not found: {$stubFile}");
             }
