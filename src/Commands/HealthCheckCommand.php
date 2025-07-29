@@ -11,7 +11,7 @@ use function Laravel\Prompts\table;
 
 class HealthCheckCommand extends Command
 {
-    protected $signature = 'conduit:health {--environment=development : Environment to check} {--format=table : Output format (table|json)}';
+    protected $signature = 'docker:health {--environment=development : Environment to check} {--format=table : Output format (table|json)}';
 
     protected $description = 'Run comprehensive health checks for the Laravel application';
 

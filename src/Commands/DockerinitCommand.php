@@ -37,7 +37,7 @@ class DockerInitCommand extends Command
         $this->info('Next steps:');
         $this->line('1. Review and customize the generated Docker files');
         $this->line('2. Update your .env file with Docker settings');
-        $this->line("3. Run: php artisan conduit:deploy --env={$environment}");
+        $this->line("3. Run: conduit docker:deploy --environment={$environment}");
 
         return Command::SUCCESS;
     }

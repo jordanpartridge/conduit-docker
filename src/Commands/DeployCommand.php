@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class DeployCommand extends Command
 {
-    protected $signature = 'conduit:deploy {--environment=development : Environment to deploy to}';
+    protected $signature = 'docker:deploy {--environment=development : Environment to deploy to}';
 
     protected $description = 'Deploy Laravel application using Docker';
 
@@ -67,7 +67,7 @@ class DeployCommand extends Command
 
         if (! file_exists($composeFile)) {
             $this->error("Docker compose file not found: {$composeFile}");
-            $this->line('Run: php artisan conduit:docker:init --env='.$environment);
+            $this->line('Run: conduit docker:init --environment='.$environment);
 
             return false;
         }
@@ -132,7 +132,7 @@ class DeployCommand extends Command
     protected function runHealthChecks(string $environment): bool
     {
         // Run the health check command
-        $exitCode = $this->call('conduit:health', ['--environment' => $environment]);
+        $exitCode = $this->call('docker:health', ['--environment' => $environment]);
 
         return $exitCode === Command::SUCCESS;
     }

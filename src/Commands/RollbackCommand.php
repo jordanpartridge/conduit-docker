@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 
 class RollbackCommand extends Command
 {
-    protected $signature = 'conduit:rollback {--environment=development : Environment to rollback} {--to=previous : Rollback target}';
+    protected $signature = 'docker:rollback {--environment=development : Environment to rollback} {--to=previous : Rollback target}';
 
     protected $description = 'Rollback to a previous deployment';
 
