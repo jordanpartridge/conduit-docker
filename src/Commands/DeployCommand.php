@@ -22,27 +22,36 @@ class DeployCommand extends Command
             return Command::FAILURE;
         }
 
-        // Run deployment steps
-        $steps = [
-            'validateConfiguration' => 'Validating configuration',
-            'buildImages' => 'Building Docker images',
-            'deployContainers' => 'Deploying containers',
-            'runHealthChecks' => 'Running health checks',
-        ];
+        // Validate configuration
+        $this->info("📋 Validating configuration...");
+        if (! $this->validateConfiguration($environment)) {
+            $this->error("❌ Configuration validation failed");
+            return Command::FAILURE;
+        }
+        $this->line("✅ Configuration validated");
 
-        foreach ($steps as $method => $description) {
-            $this->info("📋 {$description}...");
+        // Warn about build time and start background build
+        $this->warn("⚠️  Docker builds take 5-15 minutes due to PHP extension compilation.");
+        $this->warn("⚠️  Starting build in background to avoid timeout issues.");
+        $this->info("📋 Building Docker images in background...");
 
-            if (! $this->$method($environment)) {
-                $this->error("❌ {$description} failed");
-
-                return Command::FAILURE;
-            }
-
-            $this->line("✅ {$description} completed");
+        if (! $this->startBackgroundBuild($environment)) {
+            $this->error("❌ Failed to start Docker build");
+            return Command::FAILURE;
         }
 
-        $this->info('🎉 Deployment completed successfully!');
+        $this->info("✅ Docker build started successfully!");
+        $this->newLine();
+        $this->info("📊 Build Status:");
+        $this->line("• Build process: Running in background");
+        $this->line("• Expected time: 5-15 minutes");
+        $this->line("• Check progress: conduit docker:status");
+        $this->line("• View logs: docker-compose logs -f");
+        $this->newLine();
+        $this->info("🎯 Next steps:");
+        $this->line("1. Wait 5-15 minutes for build to complete");
+        $this->line("2. Run: conduit docker:status");
+        $this->line("3. Once built, containers will start automatically");
 
         return Command::SUCCESS;
     }
@@ -128,6 +137,32 @@ class DeployCommand extends Command
         sleep(5);
 
         return true;
+    }
+
+    protected function startBackgroundBuild(string $environment): bool
+    {
+        $composeFile = "docker/docker-compose.{$environment}.yml";
+
+        // Start build in background with nohup
+        $buildCommand = "nohup docker-compose -f {$composeFile} up --build -d > docker-build.log 2>&1 &";
+        
+        $process = new Process(['sh', '-c', $buildCommand], getcwd());
+        $process->run();
+
+        if (! $process->isSuccessful()) {
+            $this->error('Failed to start background build:');
+            $this->line($process->getErrorOutput());
+            return false;
+        }
+
+        // Give it a moment to start
+        sleep(2);
+
+        // Check if docker-compose process started
+        $checkProcess = new Process(['pgrep', '-f', 'docker-compose']);
+        $checkProcess->run();
+
+        return $checkProcess->isSuccessful();
     }
 
     protected function runHealthChecks(string $environment): bool

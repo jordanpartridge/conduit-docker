@@ -46,7 +46,8 @@
             "component": true,
             "commands": [
                 "docker:init",
-                "docker:deploy", 
+                "docker:deploy",
+                "docker:status", 
                 "docker:health",
                 "docker:rollback"
             ]
