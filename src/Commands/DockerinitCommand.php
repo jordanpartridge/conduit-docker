@@ -17,9 +17,10 @@ class DockerInitCommand extends Command
 
         $this->info("🐳 Initializing Docker configuration for {$environment} environment...");
 
-        // Create docker directory if it doesn't exist
-        if (! File::exists(base_path('docker'))) {
-            File::makeDirectory(base_path('docker'), 0755, true);
+        // Create docker directory if it doesn't exist (use getcwd() instead of base_path() for components)
+        $projectRoot = getcwd();
+        if (! File::exists($projectRoot . '/docker')) {
+            File::makeDirectory($projectRoot . '/docker', 0755, true);
             $this->info('📁 Created docker directory');
         }
 
@@ -56,13 +57,11 @@ class DockerInitCommand extends Command
             'start-container.sh' => 'start-container.sh',
         ];
 
+        $projectRoot = getcwd();
+        
         foreach ($files as $stub => $target) {
             $stubFile = "{$stubsPath}/{$stub}";
-            $targetFile = base_path("docker/{$target}");
-
-            $this->line("📂 Debug: Stub path: {$stubFile}");
-            $this->line("📂 Debug: Target path: {$targetFile}");
-            $this->line("📂 Debug: Base path: " . base_path());
+            $targetFile = $projectRoot . "/docker/{$target}";
 
             if (File::exists($stubFile)) {
                 try {
@@ -84,7 +83,8 @@ class DockerInitCommand extends Command
 
     protected function updateEnvExample(): void
     {
-        $envExamplePath = base_path('.env.example');
+        $projectRoot = getcwd();
+        $envExamplePath = $projectRoot . '/.env.example';
 
         if (! File::exists($envExamplePath)) {
             $this->warn('⚠️ .env.example not found, skipping Docker variables update');
@@ -115,12 +115,13 @@ class DockerInitCommand extends Command
 
     protected function validateConfiguration(): void
     {
+        $projectRoot = getcwd();
         $issues = [];
 
         // Check for required directories
         $requiredDirs = ['storage/app', 'storage/logs', 'bootstrap/cache'];
         foreach ($requiredDirs as $dir) {
-            if (! File::exists(base_path($dir))) {
+            if (! File::exists($projectRoot . '/' . $dir)) {
                 $issues[] = "Missing directory: {$dir}";
             }
         }
@@ -128,7 +129,7 @@ class DockerInitCommand extends Command
         // Check for common Laravel files
         $requiredFiles = ['artisan', 'composer.json', 'config/app.php'];
         foreach ($requiredFiles as $file) {
-            if (! File::exists(base_path($file))) {
+            if (! File::exists($projectRoot . '/' . $file)) {
                 $issues[] = "Missing file: {$file}";
             }
         }

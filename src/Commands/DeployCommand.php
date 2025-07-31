@@ -63,7 +63,8 @@ class DeployCommand extends Command
 
     protected function validateConfiguration(string $environment): bool
     {
-        $composeFile = base_path("docker/docker-compose.{$environment}.yml");
+        $projectRoot = getcwd();
+        $composeFile = $projectRoot . "/docker/docker-compose.{$environment}.yml";
 
         if (! file_exists($composeFile)) {
             $this->error("Docker compose file not found: {$composeFile}");
@@ -84,7 +85,7 @@ class DeployCommand extends Command
             '-f', $composeFile,
             'build',
             '--no-cache',
-        ], base_path()); // Set working directory to project root
+        ], getcwd()); // Set working directory to project root
 
         $process->setTimeout(300);
         $process->run();
@@ -111,7 +112,7 @@ class DeployCommand extends Command
             'up',
             '-d',
             '--remove-orphans',
-        ], base_path()); // Set working directory to project root
+        ], getcwd()); // Set working directory to project root
 
         $process->setTimeout(180);
         $process->run();
