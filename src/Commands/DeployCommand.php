@@ -87,7 +87,7 @@ class DeployCommand extends Command
             '--no-cache',
         ], getcwd()); // Set working directory to project root
 
-        $process->setTimeout(300);
+        $process->setTimeout(900); // 15 minutes for PHP extension compilation
         $process->run();
 
         if (! $process->isSuccessful()) {
@@ -114,7 +114,7 @@ class DeployCommand extends Command
             '--remove-orphans',
         ], getcwd()); // Set working directory to project root
 
-        $process->setTimeout(180);
+        $process->setTimeout(300); // 5 minutes for container startup
         $process->run();
 
         if (! $process->isSuccessful()) {
